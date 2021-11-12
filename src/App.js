@@ -9,12 +9,16 @@ import 'firebase/firestore';
 import db from './components/Firebase/Firebase';
 
 class App extends React.Component {
-  state = {
-    user: false,
-    messages: []
+  constructor() {
+    super();
+    this.state = {
+      user: false,
+      messages: []
+    }
+    this.fetchMessages = this.fetchMessages.bind(this);
   }
 
-  fetchMessages = () => {
+  fetchMessages() {
     const query = db.collection('Messages').orderBy('createdAt');
     query.onSnapshot((snapshot) => {
       snapshot.docChanges().forEach((change) => {

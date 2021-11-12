@@ -1,25 +1,45 @@
+import React from 'react';
+
 import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+
+import db from './components/Firebase/Firebase';
+
+class App extends React.Component {
+  state = {
+    user: false,
+    messages: []
+  }
+
+  fetchMessages = () => {
+    const query = db.collection('Messages').orderBy('createdAt');
+    query.onSnapshot((snapshot) => {
+      snapshot.docChanges().forEach((change) => {
+        const messageObj = {};
+        messageObj.data = change.doc.data();
+        messageObj.id = change.doc.id;
+        this.setState({
+          ...this.state,
+          messages: [messageObj, ...this.state.messages]
+        })
+      })
+    })
+  }
+
+  componentDidMount() {
+    this.fetchMessages();
+  }
+
+  render() {
+    return (
+      <div>
+        { this.state.messages.map((m) => <p>{m.data.text}</p>)}
+      </div>
+    )
+  }
 }
 
 export default App;
